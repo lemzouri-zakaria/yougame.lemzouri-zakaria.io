@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="h-full bg-[#F3EFEA] text-[#3D1E0B]">
+<html lang="fr" class="h-full bg-[#F3EFEA] text-[#3D1E0B]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ألعاب الدفع المصغر - MicroPay Games</title>
+    <title>MicroPay Games - Arcade & Micropaiement</title>
     
     <!-- PWA & Manifest Links -->
     <link rel="manifest" href="./manifest.json">
@@ -53,44 +53,44 @@
 </head>
 <body class="h-full flex flex-col font-sans bg-cream-100 text-rustBrown-900 selection:bg-amberGold-500 selection:text-white">
 
-    <!-- نافذة منبثقة لتسجيل الدخول / المصادقة -->
+    <!-- POPUP AUTHENTIFICATION / INSCRIPTION MODALE -->
     <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-        <div class="glass w-full max-w-md rounded-2xl shadow-2xl p-8 border border-amberGold-500/30 transform transition-all text-right">
+        <div class="glass w-full max-w-md rounded-2xl shadow-2xl p-8 border border-amberGold-500/30 transform transition-all">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amberGold-500 text-white text-2xl font-bold shadow-lg mb-3">
                     <i class="fa-solid fa-gamepad"></i>
                 </div>
-                <h2 class="text-2xl font-black text-rustBrown-900">مرحباً بك في MicroGames</h2>
-                <p class="text-sm text-rustBrown-700 mt-1">سجل دخولك أو أنشئ حساباً للبدء في اللعب والشحن</p>
+                <h2 class="text-2xl font-black text-rustBrown-900">Bienvenue sur MicroGames</h2>
+                <p class="text-sm text-rustBrown-700 mt-1">Connectez-vous ou inscrivez-vous pour jouer et recharger</p>
             </div>
 
             <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-rustBrown-800 mb-1">اسم المستخدم</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rustBrown-800 mb-1">Nom d'utilisateur</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-amberGold-600"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="authName" required placeholder="مثال: زكرياء" class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-cream-200 bg-white/85 focus:outline-none focus:ring-2 focus:ring-amberGold-500 text-sm">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-amberGold-600"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="authName" required placeholder="Ex: Zakaria" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-cream-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amberGold-500 text-sm">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-rustBrown-800 mb-1">رقم الواتساب</label>
-                    <div class="header-whatsapp relative">
-                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-green-600"><i class="fa-brands fa-whatsapp text-lg"></i></span>
-                        <input type="tel" id="authWhatsapp" required placeholder="+212 600 000 000" class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-cream-200 bg-white/85 focus:outline-none focus:ring-2 focus:ring-amberGold-500 text-sm text-left" dir="ltr">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rustBrown-800 mb-1">Numéro WhatsApp</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-green-600"><i class="fa-brands fa-whatsapp text-lg"></i></span>
+                        <input type="tel" id="authWhatsapp" required placeholder="+212 600 000 000" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-cream-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amberGold-500 text-sm">
                     </div>
                 </div>
 
                 <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-amberGold-500 to-rustBrown-600 text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition transform active:scale-95 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> تأكيد الدخول والمتابعة
+                    <i class="fa-solid fa-right-to-bracket"></i> Valider & Accéder au site
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- محتوى الموقع الرئيسي (مخفي حتى يتم تسجيل الدخول) -->
+    <!-- MAIN APP CONTENT (Masqué tant que non authentifié) -->
     <div id="mainApp" class="hidden flex-col h-full">
-        <!-- رأس الصفحة -->
+        <!-- HEADER -->
         <header class="bg-white/95 border-b border-cream-200 shadow-sm sticky top-0 z-30">
             <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -98,47 +98,47 @@
                         <i class="fa-solid fa-coins"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg leading-tight text-rustBrown-900">منصة الألعاب والتسديد</h1>
-                        <p class="text-xs text-rustBrown-700">متصل كـ: <span id="userDisplayName" class="font-semibold text-amberGold-600"></span></p>
+                        <h1 class="font-bold text-lg leading-tight text-rustBrown-900">MicroGames PWA</h1>
+                        <p class="text-xs text-rustBrown-700">Connecté en tant que <span id="userDisplayName" class="font-semibold text-amberGold-600"></span></p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-4">
                     <div class="bg-cream-100 px-3 py-1.5 rounded-xl border border-amberGold-500/30 flex items-center gap-2">
                         <i class="fa-solid fa-wallet text-amberGold-600"></i>
-                        <span class="text-xs font-bold uppercase text-rustBrown-800">الرصيد:</span>
-                        <span id="userCredits" class="font-black text-rustBrown-900 text-sm">0</span> <span class="text-xs font-semibold text-amberGold-600">رصيد</span>
+                        <span class="text-xs font-bold uppercase text-rustBrown-800">Solde :</span>
+                        <span id="userCredits" class="font-black text-rustBrown-900 text-sm">0</span> <span class="text-xs font-semibold text-amberGold-600">Crédits</span>
                     </div>
-                    <button onclick="logout()" class="text-xs text-rustBrown-700 hover:text-rustBrown-900 font-semibold px-2 py-1 bg-cream-200/50 rounded-lg" title="خروج">
+                    <button onclick="logout()" class="text-xs text-rustBrown-700 hover:text-rustBrown-900 font-semibold px-2 py-1 bg-cream-200/50 rounded-lg">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- شريط التنقل -->
+        <!-- NAVIGATION TABS -->
         <nav class="bg-white border-b border-cream-200 shadow-inner">
             <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto">
                 <button onclick="switchTab('game')" id="btn-tab-game" class="tab-btn px-4 py-3 font-bold text-sm text-amberGold-600 border-b-2 border-amberGold-600 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-dice"></i> لعبة الحظ والمراهنة
+                    <i class="fa-solid fa-dice"></i> Mini-Jeu Gambling
                 </button>
                 <button onclick="switchTab('recharge')" id="btn-tab-recharge" class="tab-btn px-4 py-3 font-bold text-sm text-rustBrown-700 hover:text-amberGold-600 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-mobile-screen-button"></i> شحن الرصيد (SMS / مكالمة)
+                    <i class="fa-solid fa-mobile-screen-button"></i> Recharger (SMS / Appel)
                 </button>
                 <button onclick="switchTab('script')" id="btn-tab-script" class="tab-btn px-4 py-3 font-bold text-sm text-rustBrown-700 hover:text-amberGold-600 flex items-center gap-2 whitespace-nowrap">
-                    <i class="fa-solid fa-code"></i> إدراج سكربت المزود
+                    <i class="fa-solid fa-code"></i> Intégration Script Fournisseur
                 </button>
             </div>
         </nav>
 
-        <!-- الأقسام الرئيسية -->
+        <!-- CONTENT SECTIONS -->
         <main class="flex-1 max-w-6xl w-full mx-auto p-4 overflow-y-auto">
             
-            <!-- القسم 1 : لعبة الحظ -->
+            <!-- TAB 1 : GAMBLING GAME -->
             <div id="tab-game" class="tab-content space-y-6">
                 <div class="glass p-6 rounded-2xl shadow-lg border border-amberGold-500/20 text-center max-w-xl mx-auto">
-                    <h2 class="text-2xl font-black text-rustBrown-900 mb-2">عجلة الحظ الذهبية</h2>
-                    <p class="text-sm text-rustBrown-700 mb-6">راهن برصيدك، أدر العجلة وحاول مضاعفة أرباحك فوراً!</p>
+                    <h2 class="text-2xl font-black text-rustBrown-900 mb-2">Roue de la Fortune VIP</h2>
+                    <p class="text-sm text-rustBrown-700 mb-6">Misez vos crédits, faites tourner la roue et tentez de multiplier vos gains !</p>
                     
                     <div class="relative w-64 h-64 mx-auto mb-6 flex items-center justify-center bg-gradient-to-tr from-amberGold-500 to-rustBrown-700 rounded-full shadow-xl border-4 border-white">
                         <div id="wheel" class="absolute inset-2 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center transition-transform duration-1000 text-white font-black text-xl">
@@ -148,56 +148,56 @@
                     </div>
 
                     <div class="flex items-center justify-center gap-3 mb-4">
-                        <label class="text-xs font-bold uppercase text-rustBrown-800">قيمة الرهان:</label>
+                        <label class="text-xs font-bold uppercase text-rustBrown-800">Mise :</label>
                         <input type="number" id="betAmount" value="10" min="5" max="500" class="w-24 px-3 py-1.5 text-center rounded-xl border border-cream-200 font-bold bg-white">
                     </div>
 
                     <button onclick="spinWheel()" id="spinBtn" class="w-full py-3.5 bg-gradient-to-r from-amberGold-500 to-rustBrown-600 text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition transform active:scale-95">
-                        إدارة العجلة (التكلفة: <span id="betCostDisplay">10</span> رصيد)
+                        Lancer la Roue (Coût : <span id="betCostDisplay">10</span> Crédits)
                     </button>
                     <div id="gameResult" class="mt-4 text-sm font-bold min-h-[24px]"></div>
                 </div>
             </div>
 
-            <!-- القسم 2 : شحن الرصيد عبر الدفع المصغر -->
+            <!-- TAB 2 : RECHARGE MICROPAYMENT -->
             <div id="tab-recharge" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
-                <div class="glass p-6 rounded-2xl shadow-lg border border-amberGold-500/20 text-right">
-                    <h2 class="text-xl font-black text-rustBrown-900 mb-2"><i class="fa-solid fa-credit-card text-amberGold-600"></i> شحن الرصيد عبر الدفع المصغر</h2>
-                    <p class="text-sm text-rustBrown-700 mb-6">استخدم خدمات شركائنا (StarPass, Allopass, Mobiyo...) للحصول على الرموز الخاصة بك.</p>
+                <div class="glass p-6 rounded-2xl shadow-lg border border-amberGold-500/20">
+                    <h2 class="text-xl font-black text-rustBrown-900 mb-2"><i class="fa-solid fa-credit-card text-amberGold-600"></i> Recharge de crédits par Micropaiement</h2>
+                    <p class="text-sm text-rustBrown-700 mb-6">Utilisez les services de nos partenaires (StarPass, Allopass, Mobiyo...) pour obtenir vos codes.</p>
 
-                    <!-- مساحة تضمين سكربت المزود -->
-                    <div id="micropayment-script-container" class="bg-white p-4 rounded-xl border-2 border-dashed border-amberGold-500/50 mb-6 text-center">
-                        <p class="text-xs font-bold text-amberGold-700 mb-2"><i class="fa-solid fa-circle-info"></i> مكان عرض أداة الدفع الخاصة بالمزود (StarPass / Mobiyo)</p>
-                        <!-- ⚠️ أضف سكربت المزود الخاص بك هنا ⚠️ -->
+                    <!-- ESPACE POUR VOTRE SCRIPT FOURNISSEUR -->
+                    <div id="micropayment-script-container" class="bg-white p-4 rounded-xl border-2 border-dashed border-amberGold-500/50 mb-6">
+                        <p class="text-xs font-bold text-amberGold-700 mb-2"><i class="fa-solid fa-circle-info"></i> Espace d'intégration du widget du fournisseur (StarPass / Mobiyo)</p>
+                        <!-- ⚠️ INSÉREZ VOTRE SCRIPT FOURNISSEUR CI-DESSOUS ⚠️ -->
                         <div class="p-3 bg-cream-50 rounded-lg border border-cream-200 text-center">
-                            <span class="text-xs text-rustBrown-700">سيتم عرض واجهة الدفع الخاصة بالشركة هنا تلقائياً</span>
+                            <span class="text-xs text-rustBrown-700">Widget du fournisseur affiché ici (Ex: iframe ou script StarPass)</span>
                         </div>
                     </div>
 
-                    <!-- نموذج إدخال رمز التحقق -->
+                    <!-- FORMULAIRE DE VALIDATION CODE CODE -->
                     <div class="space-y-4 pt-4 border-t border-cream-200">
-                        <h3 class="text-sm font-bold text-rustBrown-900">أدخل الرمز الذي تلقيته عبر رسالة قصيرة SMS أو المكالمة:</h3>
-                        <div class="flex gap-2" dir="ltr">
+                        <h3 class="text-sm font-bold text-rustBrown-900">Entrez votre code reçu par SMS / Appel :</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="smsCodeInput" placeholder="Ex: PASS1234 ou code de test" class="flex-1 px-4 py-2.5 rounded-xl border border-cream-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amberGold-500 font-mono uppercase">
                             <button onclick="verifyCode()" class="px-6 py-2.5 bg-rustBrown-800 text-white font-bold rounded-xl text-sm shadow hover:bg-rustBrown-900 transition">
-                                تحقق
+                                Valider
                             </button>
-                            <input type="text" id="smsCodeInput" placeholder="EX: PASS1234" class="flex-1 px-4 py-2.5 rounded-xl border border-cream-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amberGold-500 font-mono uppercase text-right">
                         </div>
-                        <p class="text-xs text-rustBrown-700">💡 رمز تجريبي مجاني للاختبار: <code class="bg-cream-200 px-1.5 py-0.5 rounded font-mono text-rustBrown-900 font-bold">DEMO100</code></p>
+                        <p class="text-xs text-rustBrown-700">💡 Code de démo gratuit pour tester : <code class="bg-cream-200 px-1.5 py-0.5 rounded font-mono text-rustBrown-900 font-bold">DEMO100</code></p>
                     </div>
                 </div>
             </div>
 
-            <!-- القسم 3 : دليل دمج السكربت -->
+            <!-- TAB 3 : INTEGRATION GUIDE -->
             <div id="tab-script" class="tab-content hidden space-y-6 max-w-3xl mx-auto">
-                <div class="glass p-6 rounded-2xl shadow-lg border border-amberGold-500/20 space-y-4 text-right">
-                    <h2 class="text-xl font-black text-rustBrown-900"><i class="fa-solid fa-code text-amberGold-600"></i> دليل دمج سكربتات الدفع المصغر</h2>
-                    <p class="text-sm text-rustBrown-700">لربط خدمات StarPass أو Allopass أو Mobiyo، قم بلصق كود الـ JavaScript أو الـ iframe الخاص بمزود الخدمة في المكان المخصص داخل قسم الشحن.</p>
+                <div class="glass p-6 rounded-2xl shadow-lg border border-amberGold-500/20 space-y-4">
+                    <h2 class="text-xl font-black text-rustBrown-900"><i class="fa-solid fa-code text-amberGold-600"></i> Guide d'intégration des scripts de Micropaiement</h2>
+                    <p class="text-sm text-rustBrown-700">Pour connecter StarPass, Allopass ou Mobiyo, vous devez insérer le code JavaScript ou l'iframe fourni par votre opérateur dans le conteneur prévu à cet effet.</p>
                     
-                    <div class="bg-rustBrown-900 text-cream-100 p-4 rounded-xl font-mono text-xs overflow-x-auto shadow-inner" dir="ltr">
-                        <pre>&lt;!-- مثال على تضمين سكربت StarPass أو Mobiyo --&gt;
+                    <div class="bg-rustBrown-900 text-cream-100 p-4 rounded-xl font-mono text-xs overflow-x-auto shadow-inner">
+                        <pre>&lt;!-- Exemple d'intégration script StarPass / Mobiyo --&gt;
 &lt;script type="text/javascript" src="https://script.starpass.fr/ihi.php?id=XXXXXX"&gt;&lt;/script&gt;
-&lt;noscript&gt;يرجى تفعيل JavaScript لعرض نافذة الدفع.&lt;/noscript&gt;</pre>
+&lt;noscript&gt;Veuillez activer JavaScript pour afficher le module de paiement.&lt;/noscript&gt;</pre>
                     </div>
                 </div>
             </div>
@@ -205,12 +205,12 @@
         </main>
     </div>
 
-    <!-- كود الجافاسكريبت للتحكم بالمنصة -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         let currentUser = null;
-        let userCredits = 50; // رصيد افتراضي ابتدائي
+        let userCredits = 50; // Crédits de départ
 
-        // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+        // Vérifier si un utilisateur est déjà enregistré
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('micropay_user');
             if (savedUser) {
@@ -254,7 +254,7 @@
             localStorage.setItem('micropay_credits', userCredits);
         }
 
-        // التنقل بين التبويبات
+        // Navigation Tabs
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
@@ -268,19 +268,19 @@
             activeBtn.classList.add('text-amberGold-600', 'border-b-2', 'border-amberGold-600');
         }
 
-        // لعبة الحظ المصغرة
+        // Mini-Jeu Gambling (Roue)
         function spinWheel() {
             const betInput = document.getElementById('betAmount');
             const bet = parseInt(betInput.value);
             const resultDiv = document.getElementById('gameResult');
 
             if (isNaN(bet) || bet <= 0) {
-                resultDiv.innerHTML = '<span class="text-red-600">الرجاء إدخال مبلغ رهان صالح.</span>';
+                resultDiv.innerHTML = '<span class="text-red-600">Veuillez entrer une mise valide.</span>';
                 return;
             }
 
             if (userCredits < bet) {
-                resultDiv.innerHTML = '<span class="text-red-600">رصيدك غير كافٍ! يرجى شحن حسابك.</span>';
+                resultDiv.innerHTML = '<span class="text-red-600">Crédits insuffisants ! Rechargez votre compte.</span>';
                 return;
             }
 
@@ -292,25 +292,25 @@
             wheel.style.transform = `rotate(${randomRotation}deg)`;
 
             document.getElementById('spinBtn').disabled = true;
-            resultDiv.innerHTML = '<span class="text-amberGold-600">جاري تدوير العجلة... 🎲</span>';
+            resultDiv.innerHTML = '<span class="text-amberGold-600">La roue tourne... 🎲</span>';
 
             setTimeout(() => {
-                const win = Math.random() > 0.45; // نسبة الفوز 55%
+                const win = Math.random() > 0.45; // 55% de chance de gagner
                 if (win) {
                     const multiplier = Math.random() > 0.8 ? 3 : 2;
                     const winnings = bet * multiplier;
                     userCredits += winnings;
                     updateCreditsDisplay();
-                    resultDiv.innerHTML = `<span class="text-green-700">🎉 مبروك! ربحت +${winnings} رصيد إضافي!</span>`;
+                    resultDiv.innerHTML = `<span class="text-green-700">🎉 Gagné ! Vous remportez +${winnings} crédits !</span>`;
                     confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
                 } else {
-                    resultDiv.innerHTML = `<span class="text-rustBrown-800">😢 حظ أوفر في المرة القادمة!</span>`;
+                    resultDiv.innerHTML = `<span class="text-rustBrown-800">😢 Perdu ! Retentez votre chance.</span>`;
                 }
                 document.getElementById('spinBtn').disabled = false;
             }, 1000);
         }
 
-        // التحقق من كود الدفع المصغر (محاكاة StarPass / Mobiyo / Allopass)
+        // Vérification Code Micropaiement (StarPass / Allopass / Mobiyo simulé)
         function verifyCode() {
             const code = document.getElementById('smsCodeInput').value.trim().toUpperCase();
             if (!code) return;
@@ -318,11 +318,11 @@
             if (code === 'DEMO100' || code.startsWith('PASS')) {
                 userCredits += 100;
                 updateCreditsDisplay();
-                alert('تم التحقق من الكود بنجاح! تمت إضافة 100 رصيد لحسابك.');
+                alert('Code validé avec succès ! +100 crédits ajoutés à votre compte.');
                 document.getElementById('smsCodeInput').value = '';
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
             } else {
-                alert('الرمز غير صالح أو تم استخدامه مسبقاً. (استخدم رمز التجربة: DEMO100)');
+                alert('Code invalide ou déjà utilisé. (Utilisez "DEMO100" pour tester)');
             }
         }
     </script>
