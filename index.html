@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-[#EFEFEF] text-[#3D1E0B]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroPay Games - Arcade & Micropaiement</title>
+    <!-- Dynamic Favicon -->
+    <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            50: '#FAF7F0',
+                            100: '#F5EFE0',
+                            200: '#EBE0C7',
+                        },
+                        amberGold: {
+                            400: '#F0BA4E',
+                            500: '#E4A834',
+                            600: '#C98D22',
+                        },
+                        terracotta: {
+                            500: '#C6782B',
+                            600: '#B0641C',
+                        },
+                        rust: {
+                            700: '#9E4A1A',
+                            800: '#7F3710',
+                            900: '#4D1E04',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .warm-card {
+            background-color: #F5EFE0;
+            border: 1px solid rgba(198, 120, 43, 0.2);
+            box-shadow: 0 4px 20px -2px rgba(158, 74, 26, 0.08);
+        }
+        .glow-warm {
+            box-shadow: 0 0 25px -5px rgba(228, 168, 52, 0.4);
+        }
+        #wheel {
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 0.99);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased selection:bg-terracotta-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-[#F5EFE0] sticky top-0 z-40 border-b border-terracotta-500/20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rust-700 to-amberGold-500 flex items-center justify-center text-xl shadow-md glow-warm text-white" id="header-logo-icon">
+                        🎰
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-wide text-rust-900">MicroPay Games</span>
+                        <span class="hidden sm:inline-block text-xs bg-terracotta-500/10 text-rust-700 font-semibold px-2 py-0.5 rounded-full border border-terracotta-500/20 ml-2">v2.0 Palette Nature</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-rust-800 hover:bg-cream-200">
+                        <i class="fa-solid fa-chart-pie mr-2 text-terracotta-500"></i>Tableau de Bord
+                    </button>
+                    <button onclick="switchTab('recharge')" id="nav-recharge" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-rust-800 hover:bg-cream-200">
+                        <i class="fa-solid fa-mobile-screen-button text-emerald-700 mr-2"></i>Recharger (SMS/Call)
+                    </button>
+                    <button onclick="switchTab('game')" id="nav-game" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-rust-800 hover:bg-cream-200">
+                        <i class="fa-solid fa-dice text-amberGold-600 mr-2"></i>Mini-Jeu Casino
+                    </button>
+                    <button onclick="switchTab('code-integration')" id="nav-code-integration" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-rust-800 hover:bg-cream-200">
+                        <i class="fa-solid fa-code text-rust-700 mr-2"></i>Intégration Script
+                    </button>
+                </nav>
+
+                <!-- User Profile / Balance Badge -->
+                <div class="flex items-center space-x-3">
+                    <div id="user-wallet-badge" class="flex items-center bg-cream-50 border border-amberGold-500/40 px-3 py-1.5 rounded-full shadow-inner">
+                        <i class="fa-solid fa-coins text-amberGold-500 mr-2 animate-bounce"></i>
+                        <span id="user-balance-text" class="font-extrabold text-rust-900">0</span>
+                        <span class="text-xs text-rust-700 font-medium ml-1">crédits</span>
+                    </div>
+
+                    <div id="auth-buttons">
+                        <button onclick="openAuthModal('login')" class="bg-rust-700 hover:bg-rust-800 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all shadow-md">
+                            <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Connexion / Inscription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="md:hidden flex border-t border-terracotta-500/20 bg-[#F5EFE0] divide-x divide-cream-200 text-center text-xs">
+            <button onclick="switchTab('dashboard')" class="flex-1 py-3 text-rust-800 font-semibold hover:bg-cream-200">
+                <i class="fa-solid fa-chart-pie block mb-1 text-base text-terracotta-500"></i>Bord
+            </button>
+            <button onclick="switchTab('recharge')" class="flex-1 py-3 text-rust-800 font-semibold hover:bg-cream-200">
+                <i class="fa-solid fa-mobile-screen-button block mb-1 text-base text-emerald-700"></i>Recharge
+            </button>
+            <button onclick="switchTab('game')" class="flex-1 py-3 text-rust-800 font-semibold hover:bg-cream-200">
+                <i class="fa-solid fa-dice block mb-1 text-base text-amberGold-600"></i>Jeu
+            </button>
+            <button onclick="switchTab('code-integration')" class="flex-1 py-3 text-rust-800 font-semibold hover:bg-cream-200">
+                <i class="fa-solid fa-code block mb-1 text-base text-rust-700"></i>Script
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- TAB 1: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            <div class="warm-card p-6 sm:p-8 rounded-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-amberGold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-rust-900 mb-2">Bienvenue sur la plateforme de démonstration</h1>
+                <p class="text-rust-800/80 max-w-2xl text-sm sm:text-base leading-relaxed">
+                    Ce site modèle illustre l'intégration complète d'une solution de micropaiement (StarPass, Mobiyo, AlloPass) couplée à un compte authentifié et un mini-jeu de casino interactif.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-4">
+                    <button onclick="switchTab('recharge')" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center">
+                        <i class="fa-solid fa-bolt mr-2"></i> Recharger par SMS / Appel
+                    </button>
+                    <button onclick="switchTab('game')" class="bg-amberGold-500 hover:bg-amberGold-600 text-rust-900 font-extrabold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center">
+                        <i class="fa-solid fa-gamepad mr-2"></i> Lancer la Roue de la Fortune
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="warm-card p-6 rounded-2xl border-l-4 border-amberGold-500">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-rust-700 uppercase tracking-wider">Solde Actuel</span>
+                        <div class="w-9 h-9 rounded-lg bg-amberGold-500/20 text-rust-800 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-black text-rust-900"><span id="dash-balance">0</span> <span class="text-sm font-semibold text-rust-700">crédits</span></div>
+                    <p class="text-xs text-rust-700/80 mt-2">Crédités immédiatement après validation.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="warm-card p-6 rounded-2xl border-l-4 border-terracotta-500">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-rust-700 uppercase tracking-wider">Recharges Validées</span>
+                        <div class="w-9 h-9 rounded-lg bg-terracotta-500/20 text-terracotta-600 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-black text-rust-900" id="dash-recharges-count">0</div>
+                    <p class="text-xs text-rust-700/80 mt-2">Codes SMS & Audiotel validés.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="warm-card p-6 rounded-2xl border-l-4 border-rust-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-rust-700 uppercase tracking-wider">Parties Jouées</span>
+                        <div class="w-9 h-9 rounded-lg bg-rust-700/20 text-rust-800 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-black text-rust-900" id="dash-games-count">0</div>
+                    <p class="text-xs text-rust-700/80 mt-2">Tours de Roue joués.</p>
+                </div>
+            </div>
+
+            <!-- User Info & WhatsApp Banner -->
+            <div id="user-info-banner" class="warm-card p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between border-amberGold-500/30">
+                <div class="flex items-center space-x-3 mb-3 sm:mb-0">
+                    <div class="w-12 h-12 rounded-full bg-emerald-600/20 text-emerald-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-rust-900" id="banner-user-name">Statut: Non Authentifié</div>
+                        <div class="text-xs text-rust-700" id="banner-user-phone">WhatsApp: non renseigné</div>
+                    </div>
+                </div>
+                <button onclick="openAuthModal('signup')" class="bg-rust-700 hover:bg-rust-800 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-all">
+                    Mettre à jour mes informations
+                </button>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="warm-card p-6 rounded-2xl">
+                <h3 class="text-lg font-bold text-rust-900 mb-4 flex items-center">
+                    <i class="fa-solid fa-clock-rotate-left text-terracotta-500 mr-2"></i> Historique d'activité
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-rust-900">
+                        <thead class="text-xs uppercase bg-cream-200 text-rust-800 border-b border-terracotta-500/20">
+                            <tr>
+                                <th class="p-3">Type</th>
+                                <th class="p-3">Détails</th>
+                                <th class="p-3">Montant / Payout</th>
+                                <th class="p-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-log-table" class="divide-y divide-cream-200">
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-rust-700/60 italic">Aucune activité enregistrée.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: RECHARGE / MICROPAIEMENT -->
+        <section id="tab-recharge" class="tab-content hidden space-y-6">
+            <div class="warm-card p-6 rounded-2xl border-b border-terracotta-500/30">
+                <div class="max-w-3xl">
+                    <h2 class="text-xl sm:text-2xl font-bold text-rust-900 mb-2 flex items-center">
+                        <i class="fa-solid fa-mobile-screen-button text-emerald-700 mr-3"></i>
+                        Espace Recharge de Crédits
+                    </h2>
+                    <p class="text-rust-800/80 text-sm">
+                        Sélectionnez votre méthode de paiement (SMS ou Appel téléphonique Audiotel). Saisissez le code reçu pour recharger immédiatement votre compte.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- User Simulator -->
+                <div class="warm-card p-6 rounded-2xl space-y-6">
+                    <h3 class="text-lg font-bold text-rust-900 flex items-center border-b border-cream-200 pb-3">
+                        <span class="bg-terracotta-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-full mr-2">1</span> 
+                        Effectuer la recharge
+                    </h3>
+
+                    <!-- Type Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-2">Choisir le moyen de paiement</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="selectPaymentMethod('sms')" id="btn-method-sms" class="method-select-btn p-4 rounded-xl border border-terracotta-500 bg-terracotta-500/10 text-rust-900 text-left flex items-center space-x-3 transition-all">
+                                <div class="w-10 h-10 rounded-lg bg-terracotta-500/20 flex items-center justify-center text-terracotta-600 text-lg">
+                                    <i class="fa-solid fa-comment-sms"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Par SMS</div>
+                                    <div class="text-xs text-rust-700">+100 Crédits</div>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="selectPaymentMethod('call')" id="btn-method-call" class="method-select-btn p-4 rounded-xl border border-cream-200 bg-cream-50 text-rust-700 text-left flex items-center space-x-3 transition-all hover:border-terracotta-500">
+                                <div class="w-10 h-10 rounded-lg bg-cream-200 flex items-center justify-center text-rust-800 text-lg">
+                                    <i class="fa-solid fa-phone"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Par Appel Audiotel</div>
+                                    <div class="text-xs text-rust-700">+150 Crédits</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Instructions Display -->
+                    <div id="payment-instructions" class="p-4 rounded-xl bg-cream-50 border border-cream-200 text-sm space-y-2">
+                        <div class="font-bold text-terracotta-600 flex items-center">
+                            <i class="fa-solid fa-info-circle mr-2"></i> Instructions pour le paiement SMS :
+                        </div>
+                        <p class="text-rust-800 text-xs leading-relaxed">
+                            Envoyez le mot <strong class="text-rust-900 bg-cream-200 px-1.5 py-0.5 rounded">CODE</strong> au <strong class="text-rust-900 bg-cream-200 px-1.5 py-0.5 rounded">81081</strong> (Prix: 2,99€ + coût SMS). Entrez le code reçu ci-dessous.
+                        </p>
+                    </div>
+
+                    <!-- Form Code -->
+                    <form onsubmit="handleCodeValidation(event)" class="space-y-4">
+                        <div>
+                            <label for="payment-code-input" class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Entrez le code reçu</label>
+                            <input type="text" id="payment-code-input" required placeholder="Ex: PASS100 ou DEMO123" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl px-4 py-3 text-rust-900 focus:outline-none focus:border-terracotta-500 font-mono tracking-wider uppercase font-bold">
+                            <p class="text-xs text-rust-700 mt-1">Codes de test : <code class="text-rust-900 font-bold font-mono">PASS100</code>, <code class="text-rust-900 font-bold font-mono">DEMO123</code>, <code class="text-rust-900 font-bold font-mono">STAR888</code></p>
+                        </div>
+
+                        <button type="submit" id="btn-validate-code" class="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <span>Valider le Code et Créditer</span>
+                        </button>
+                    </form>
+
+                    <!-- Feedback -->
+                    <div id="recharge-feedback" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
+                </div>
+
+                <!-- Provider Integration Slot -->
+                <div class="warm-card p-6 rounded-2xl flex flex-col justify-between border-dashed border-2 border-terracotta-500/40">
+                    <div>
+                        <h3 class="text-lg font-bold text-rust-900 flex items-center border-b border-cream-200 pb-3 mb-4">
+                            <span class="bg-amberGold-500 text-rust-900 text-xs font-extrabold px-2.5 py-1 rounded-full mr-2">SCRIPT</span> 
+                            Widget du Prestataire (StarPass, Mobiyo...)
+                        </h3>
+                        <p class="text-xs text-rust-800/80 mb-4">
+                            Emplacement réservé pour l'insertion du script ou de l'iframe de votre prestataire de paiement.
+                        </p>
+
+                        <!-- SCRIPT SLOT -->
+                        <div id="micropayment-provider-script-container" class="bg-cream-50 p-6 rounded-xl border border-cream-200 text-center min-h-[220px] flex flex-col items-center justify-center relative">
+                            <!--
+                                ====================================================================
+                                INSTRUCTIONS D'INTEGRATION POUR LE DEVELOPPEUR :
+                                Remplacez le bloc d'exemple ci-dessous par le script StarPass / Mobiyo.
+                                Ex (StarPass):
+                                <div id="starpass_12345"></div>
+                                <script type="text/javascript" src="https://script.starpass.fr/script.php?idd=12345&verif_hit=1"></script>
+                                ====================================================================
+                            -->
+                            <div class="w-12 h-12 rounded-full bg-amberGold-500/20 text-rust-800 flex items-center justify-center text-xl mb-3 border border-amberGold-500/30">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <h4 class="font-bold text-rust-900 text-sm">Zone d'insertion du Script Externe</h4>
+                            <p class="text-rust-700 text-xs mt-1 max-w-xs">
+                                L'iframe / Widget interactif apparaîtra dans ce conteneur.
+                            </p>
+                            <div class="mt-4 px-3 py-1.5 bg-cream-200 rounded-lg text-xs font-mono text-rust-800 border border-terracotta-500/20">
+                                &lt;!-- Insérez votre script fournisseur ici --&gt;
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-cream-200 text-xs text-rust-700 flex items-center justify-between">
+                        <span><i class="fa-solid fa-shield-halved text-emerald-700 mr-1"></i> Connexion Sécurisée</span>
+                        <span>API Callback Ready</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MINI-GAME (GAMBLING / WHEEL) -->
+        <section id="tab-game" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                <!-- Controls -->
+                <div class="warm-card p-6 rounded-2xl space-y-6 lg:col-span-1">
+                    <div class="border-b border-cream-200 pb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">🎰</span>
+                            <h2 class="text-xl font-bold text-rust-900">Roue de la Fortune</h2>
+                        </div>
+                        <p class="text-rust-700 text-xs mt-1">Misez vos crédits et tentez de multiplier vos gains !</p>
+                    </div>
+
+                    <!-- Bet Amount Control -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-2">Choisir votre mise</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setBetAmount(10)" class="bet-btn p-2 rounded-lg bg-cream-50 border border-terracotta-500/30 text-rust-900 font-bold text-sm hover:bg-cream-200 active:scale-95 transition-all">10</button>
+                            <button onclick="setBetAmount(25)" class="bet-btn p-2 rounded-lg bg-cream-50 border border-terracotta-500/30 text-rust-900 font-bold text-sm hover:bg-cream-200 active:scale-95 transition-all">25</button>
+                            <button onclick="setBetAmount(50)" class="bet-btn p-2 rounded-lg bg-cream-50 border border-terracotta-500/30 text-rust-900 font-bold text-sm hover:bg-cream-200 active:scale-95 transition-all">50</button>
+                        </div>
+                        <div class="mt-3 flex items-center space-x-2">
+                            <span class="text-xs text-rust-700">Mise actuelle:</span>
+                            <span id="current-bet-display" class="font-black text-terracotta-600 text-base">10</span>
+                            <span class="text-xs text-rust-700">crédits</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button id="spin-btn" onclick="spinWheel()" class="w-full bg-gradient-to-r from-amberGold-500 to-terracotta-500 hover:from-amberGold-400 hover:to-terracotta-600 text-white font-black text-lg py-4 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>TOURNER LA ROUE</span>
+                    </button>
+
+                    <!-- Game Status Box -->
+                    <div id="game-status-box" class="p-4 rounded-xl bg-cream-50 border border-cream-200 text-center min-h-[70px] flex items-center justify-center">
+                        <span class="text-sm text-rust-700 font-medium">Placez votre mise et tournez la roue !</span>
+                    </div>
+
+                    <!-- Multipliers Legend -->
+                    <div class="space-y-2 border-t border-cream-200 pt-4">
+                        <span class="text-xs font-bold text-rust-800 uppercase tracking-wider block">Gains & Multiplicateurs :</span>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="flex items-center justify-between p-1.5 rounded bg-cream-50 border border-cream-200">
+                                <span class="text-amberGold-600 font-bold">x5 (Jackpot)</span>
+                                <span class="text-rust-700">Segment Or</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded bg-cream-50 border border-cream-200">
+                                <span class="text-emerald-700 font-bold">x2 (Gain)</span>
+                                <span class="text-rust-700">Segment Vert</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded bg-cream-50 border border-cream-200">
+                                <span class="text-rust-700 font-bold">x1 (Remboursé)</span>
+                                <span class="text-rust-700">Segment Terracotta</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded bg-cream-50 border border-cream-200">
+                                <span class="text-rose-700 font-bold">x0 (Perdu)</span>
+                                <span class="text-rust-700">Segment Rouge</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Display -->
+                <div class="warm-card p-6 sm:p-8 rounded-2xl lg:col-span-2 flex flex-col items-center justify-center relative overflow-hidden min-h-[420px]">
+                    <div class="absolute top-6 z-20 text-rust-900 text-3xl drop-shadow-md">
+                        <i class="fa-solid fa-location-pin fa-rotate-180"></i>
+                    </div>
+
+                    <div class="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center">
+                        <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full rounded-full shadow-lg border-4 border-rust-700"></canvas>
+                        <div class="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#F5EFE0] border-4 border-rust-700 shadow-inner flex items-center justify-center text-2xl z-10">
+                            🎰
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CODE & INTEGRATION EXPLANATIONS -->
+        <section id="tab-code-integration" class="tab-content hidden space-y-6">
+            <div class="warm-card p-6 rounded-2xl">
+                <h2 class="text-xl font-bold text-rust-900 mb-2 flex items-center">
+                    <i class="fa-solid fa-code text-terracotta-500 mr-3"></i>
+                    Guide d'intégration & Exemple de Code
+                </h2>
+                <p class="text-rust-800/80 text-sm">
+                    Spécifications techniques pour connecter votre script micropaiement et votre base utilisateur WhatsApp.
+                </p>
+            </div>
+
+            <div class="warm-card p-6 rounded-2xl space-y-4">
+                <h3 class="text-md font-bold text-rust-900">1. Emplacement HTML du Script Fournisseur</h3>
+                <div class="bg-rust-900 p-4 rounded-xl border border-rust-800 font-mono text-xs text-amberGold-400 overflow-x-auto">
+                    <pre>&lt;!-- EMPLACEMENT SCRIPT FOURNISSEUR MICROPAIEMENT --&gt;
+&lt;div id="micropayment-script-box"&gt;
+    &lt;!-- Collez ici le code HTML/JS donné par StarPass / Mobiyo --&gt;
+    &lt;script type="text/javascript" src="https://script.starpass.fr/script.php?idd=VOTRE_ID_DOC"&gt;&lt;/script&gt;
+&lt;/div&gt;</pre>
+                </div>
+            </div>
+
+            <div class="warm-card p-6 rounded-2xl space-y-4">
+                <h3 class="text-md font-bold text-rust-900">2. Connexion Callback Javascript</h3>
+                <div class="bg-rust-900 p-4 rounded-xl border border-rust-800 font-mono text-xs text-cream-100 overflow-x-auto">
+                    <pre>// Fonction globale appelée après validation du code SMS/Appel
+function creditUserAccount(creditsToAdd, providerName = 'SMS/Audiotel') {
+    if (!currentUser) return;
+
+    currentUser.balance += creditsToAdd;
+    currentUser.rechargesCount += 1;
+
+    currentUser.history.unshift({
+        type: 'Recharge ' + providerName,
+        details: 'Code validé avec succès',
+        amount: '+' + creditsToAdd + ' crédits',
+        date: new Date().toLocaleTimeString()
+    });
+
+    saveUserData();
+    updateUI();
+}</pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CLASSIC AUTHENTICATION MODAL (POP-UP CONFORME) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-rust-900/60 backdrop-blur-sm hidden p-4">
+        <div class="warm-card max-w-md w-full p-6 sm:p-8 rounded-2xl border-2 border-terracotta-500 shadow-2xl relative animate-fade-in">
+            
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-rust-700 hover:text-rust-900 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header Tabs (Classic Toggle) -->
+            <div class="flex border-b border-cream-200 mb-6">
+                <button onclick="toggleAuthTab('login')" id="auth-tab-login" class="flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-terracotta-500 text-terracotta-500 transition-all">
+                    <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Connexion
+                </button>
+                <button onclick="toggleAuthTab('signup')" id="auth-tab-signup" class="flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-transparent text-rust-700 hover:text-rust-900 transition-all">
+                    <i class="fa-solid fa-user-plus mr-1.5"></i> Inscription
+                </button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="auth-form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Nom d'utilisateur / Pseudo</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-rust-700"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="login-username" required placeholder="Ex: Joueur77" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl pl-10 pr-4 py-2.5 text-rust-900 focus:outline-none focus:border-terracotta-500 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Mot de Passe</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-rust-700"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl pl-10 pr-4 py-2.5 text-rust-900 focus:outline-none focus:border-terracotta-500 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-bold py-3 rounded-xl shadow-md transition-all text-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Se Connecter</span>
+                </button>
+            </form>
+
+            <!-- SIGNUP FORM -->
+            <form id="auth-form-signup" onsubmit="handleSignupSubmit(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Nom d'utilisateur / Pseudo</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-rust-700"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="signup-username" required placeholder="Ex: AlexVIP" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl pl-10 pr-4 py-2.5 text-rust-900 focus:outline-none focus:border-terracotta-500 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Numéro Téléphone (WhatsApp)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-700"><i class="fa-brands fa-whatsapp"></i></span>
+                        <input type="tel" id="signup-whatsapp" required placeholder="+33 6 12 34 56 78" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl pl-10 pr-4 py-2.5 text-rust-900 focus:outline-none focus:border-terracotta-500 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rust-800 mb-1">Créer un Mot de Passe</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-rust-700"><i class="fa-solid fa-key"></i></span>
+                        <input type="password" id="signup-password" required placeholder="••••••••" class="w-full bg-cream-50 border border-terracotta-500/30 rounded-xl pl-10 pr-4 py-2.5 text-rust-900 focus:outline-none focus:border-terracotta-500 text-sm font-semibold">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-rust-700 hover:bg-rust-800 text-white font-bold py-3 rounded-xl shadow-md transition-all text-sm flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>Créer mon Compte (50 Crédits Offerts)</span>
+                </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-t border-cream-200 text-center">
+                <button type="button" onclick="loadDemoAccount()" class="text-xs text-terracotta-600 font-bold hover:underline">
+                    Ou charger un compte de démonstration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // STATE MANAGEMENT
+        let currentUser = null;
+        let selectedPaymentType = 'sms';
+        let currentBet = 10;
+        let isSpinning = false;
+
+        const validTestCodes = {
+            'PASS100': 100,
+            'DEMO123': 150,
+            'STAR888': 200,
+            'TESTSMS': 100
+        };
+
+        const wheelSegments = [
+            { multiplier: 0, color: '#DC2626', label: 'PERDU 0x' },
+            { multiplier: 1, color: '#C6782B', label: '1x RE-TRY' },
+            { multiplier: 2, color: '#047857', label: 'GAIN 2x' },
+            { multiplier: 0, color: '#DC2626', label: 'PERDU 0x' },
+            { multiplier: 5, color: '#E4A834', label: 'JACKPOT 5x' },
+            { multiplier: 1, color: '#C6782B', label: '1x RE-TRY' },
+            { multiplier: 2, color: '#047857', label: 'GAIN 2x' },
+            { multiplier: 0, color: '#DC2626', label: 'PERDU 0x' }
+        ];
+
+        window.onload = function () {
+            const savedUser = localStorage.getItem('micropay_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+            } else {
+                // Auto open modal for guest user
+                openAuthModal('signup');
+                currentUser = {
+                    username: 'Visiteur',
+                    whatsapp: '',
+                    balance: 0,
+                    rechargesCount: 0,
+                    gamesCount: 0,
+                    history: []
+                };
+            }
+
+            drawWheel();
+            updateUI();
+        };
+
+        // NAVIGATION
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-cream-200', 'text-rust-900');
+                el.classList.add('text-rust-800');
+            });
+
+            const activeContent = document.getElementById('tab-' + tabId);
+            const activeNav = document.getElementById('nav-' + tabId);
+
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeNav) {
+                activeNav.classList.add('bg-cream-200', 'text-rust-900');
+            }
+        }
+
+        // AUTH MODAL LOGIC
+        function openAuthModal(mode = 'login') {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            toggleAuthTab(mode);
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function toggleAuthTab(mode) {
+            const loginTab = document.getElementById('auth-tab-login');
+            const signupTab = document.getElementById('auth-tab-signup');
+            const loginForm = document.getElementById('auth-form-login');
+            const signupForm = document.getElementById('auth-form-signup');
+
+            if (mode === 'login') {
+                loginTab.className = 'flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-terracotta-500 text-terracotta-500 transition-all';
+                signupTab.className = 'flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-transparent text-rust-700 hover:text-rust-900 transition-all';
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            } else {
+                signupTab.className = 'flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-terracotta-500 text-terracotta-500 transition-all';
+                loginTab.className = 'flex-1 py-3 text-center font-extrabold text-sm border-b-2 border-transparent text-rust-700 hover:text-rust-900 transition-all';
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            if (!username) return;
+
+            currentUser.username = username;
+            if (!currentUser.balance) currentUser.balance = 50;
+            saveUserData();
+            updateUI();
+            closeAuthModal();
+        }
+
+        function handleSignupSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value.trim();
+            const whatsapp = document.getElementById('signup-whatsapp').value.trim();
+
+            if (!username || !whatsapp) return;
+
+            currentUser = {
+                username: username,
+                whatsapp: whatsapp,
+                balance: 50, // Bonus d'inscription
+                rechargesCount: 0,
+                gamesCount: 0,
+                history: [
+                    { type: 'Bonus Inscription', details: 'Bienvenue sur la plateforme', amount: '+50 crédits', date: new Date().toLocaleTimeString() }
+                ]
+            };
+
+            saveUserData();
+            updateUI();
+            closeAuthModal();
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
+            }
+        }
+
+        function loadDemoAccount() {
+            currentUser = {
+                username: 'JoueurDemo',
+                whatsapp: '+33 6 99 88 77 66',
+                balance: 200,
+                rechargesCount: 2,
+                gamesCount: 4,
+                history: [
+                    { type: 'Recharge SMS', details: 'Code DEMO123', amount: '+150 crédits', date: 'Hier' },
+                    { type: 'Gain Roulette', details: 'Multiplier x2', amount: '+40 crédits', date: 'Hier' }
+                ]
+            };
+            saveUserData();
+            updateUI();
+            closeAuthModal();
+        }
+
+        function saveUserData() {
+            localStorage.setItem('micropay_user', JSON.stringify(currentUser));
+        }
+
+        function updateUI() {
+            if (!currentUser) return;
+
+            // Balance & Header
+            document.getElementById('user-balance-text').textContent = currentUser.balance;
+
+            const authButtons = document.getElementById('auth-buttons');
+            authButtons.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-rust-900 font-bold hidden sm:inline-block"><i class="fa-solid fa-user-check text-emerald-700 mr-1"></i>${currentUser.username}</span>
+                    <button onclick="openAuthModal('signup')" class="text-xs bg-cream-200 hover:bg-cream-100 text-rust-900 font-bold px-3 py-1.5 rounded-lg border border-terracotta-500/20">
+                        Profil
+                    </button>
+                </div>
+            `;
+
+            // Dashboard
+            document.getElementById('dash-balance').textContent = currentUser.balance;
+            document.getElementById('dash-recharges-count').textContent = currentUser.rechargesCount;
+            document.getElementById('dash-games-count').textContent = currentUser.gamesCount;
+
+            // Banner
+            document.getElementById('banner-user-name').textContent = 'Membre Authentifié: ' + currentUser.username;
+            document.getElementById('banner-user-phone').textContent = 'WhatsApp: ' + (currentUser.whatsapp || 'non renseigné');
+
+            // Activity Log
+            const historyBody = document.getElementById('activity-log-table');
+            if (currentUser.history.length === 0) {
+                historyBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-rust-700/60 italic">Aucune activité enregistrée.</td></tr>`;
+            } else {
+                historyBody.innerHTML = currentUser.history.map(item => `
+                    <tr class="hover:bg-cream-100/60">
+                        <td class="p-3 font-bold text-rust-900">${item.type}</td>
+                        <td class="p-3 text-rust-800 text-xs">${item.details}</td>
+                        <td class="p-3 font-black ${item.amount.startsWith('+') ? 'text-emerald-700' : 'text-rose-700'}">${item.amount}</td>
+                        <td class="p-3 text-rust-700/70 text-xs">${item.date}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // RECHARGE LOGIC
+        function selectPaymentMethod(type) {
+            selectedPaymentType = type;
+            const btnSms = document.getElementById('btn-method-sms');
+            const btnCall = document.getElementById('btn-method-call');
+            const instructions = document.getElementById('payment-instructions');
+
+            if (type === 'sms') {
+                btnSms.className = 'method-select-btn p-4 rounded-xl border border-terracotta-500 bg-terracotta-500/10 text-rust-900 text-left flex items-center space-x-3 transition-all';
+                btnCall.className = 'method-select-btn p-4 rounded-xl border border-cream-200 bg-cream-50 text-rust-700 text-left flex items-center space-x-3 transition-all hover:border-terracotta-500';
+                instructions.innerHTML = `
+                    <div class="font-bold text-terracotta-600 flex items-center">
+                        <i class="fa-solid fa-comment-sms mr-2"></i> Instructions pour le paiement SMS (+100 Crédits) :
+                    </div>
+                    <p class="text-rust-800 text-xs leading-relaxed">
+                        Envoyez le mot <strong class="text-rust-900 bg-cream-200 px-1.5 py-0.5 rounded">CODE</strong> au <strong class="text-rust-900 bg-cream-200 px-1.5 py-0.5 rounded">81081</strong> (Prix: 2,99€ + SMS). Entrez le code reçu ci-dessous.
+                    </p>
+                `;
+            } else {
+                btnCall.className = 'method-select-btn p-4 rounded-xl border border-terracotta-500 bg-terracotta-500/10 text-rust-900 text-left flex items-center space-x-3 transition-all';
+                btnSms.className = 'method-select-btn p-4 rounded-xl border border-cream-200 bg-cream-50 text-rust-700 text-left flex items-center space-x-3 transition-all hover:border-terracotta-500';
+                instructions.innerHTML = `
+                    <div class="font-bold text-terracotta-600 flex items-center">
+                        <i class="fa-solid fa-phone mr-2"></i> Instructions pour l'Appel Audiotel (+150 Crédits) :
+                    </div>
+                    <p class="text-rust-800 text-xs leading-relaxed">
+                        Appelez le <strong class="text-rust-900 bg-cream-200 px-1.5 py-0.5 rounded">08 99 00 11 22</strong> (2,99€ / appel). Notez et entrez le code dicté ci-dessous.
+                    </p>
+                `;
+            }
+        }
+
+        function handleCodeValidation(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('payment-code-input');
+            const code = inputEl.value.trim().toUpperCase();
+            const feedbackEl = document.getElementById('recharge-feedback');
+
+            feedbackEl.classList.remove('hidden', 'bg-emerald-600/20', 'text-emerald-800', 'bg-rose-600/20', 'text-rose-800');
+
+            if (validTestCodes[code] || code.length >= 6) {
+                const creditsAdded = validTestCodes[code] || (selectedPaymentType === 'sms' ? 100 : 150);
+                
+                creditUserAccount(creditsAdded, `Micropaiement (${selectedPaymentType.toUpperCase()})`);
+
+                feedbackEl.classList.add('bg-emerald-600/20', 'text-emerald-800', 'border', 'border-emerald-600/30');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> Code <strong>${code}</strong> validé avec succès ! +${creditsAdded} crédits ajoutés.`;
+                inputEl.value = '';
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+                }
+            } else {
+                feedbackEl.classList.add('bg-rose-600/20', 'text-rose-800', 'border', 'border-rose-600/30');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-2"></i> Code invalide. Testez avec <strong>PASS100</strong> ou <strong>DEMO123</strong>.`;
+            }
+        }
+
+        function creditUserAccount(amount, providerName = 'StarPass/Mobiyo') {
+            if (!currentUser) return;
+
+            currentUser.balance += amount;
+            currentUser.rechargesCount += 1;
+            currentUser.history.unshift({
+                type: 'Recharge ' + providerName,
+                details: 'Validation API Prestataire',
+                amount: '+' + amount + ' crédits',
+                date: new Date().toLocaleTimeString()
+            });
+
+            saveUserData();
+            updateUI();
+        }
+
+        // GAMBLING WHEEL GAME
+        function setBetAmount(amount) {
+            currentBet = amount;
+            document.getElementById('current-bet-display').textContent = amount;
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheel-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const numSegments = wheelSegments.length;
+            const arcSize = (2 * Math.PI) / numSegments;
+            const radius = canvas.width / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * arcSize;
+                ctx.beginPath();
+                ctx.fillStyle = wheelSegments[i].color;
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius - 10, angle, angle + arcSize);
+                ctx.lineTo(radius, radius);
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#F5EFE0';
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText(wheelSegments[i].label, radius - 25, 5);
+                ctx.restore();
+            }
+        }
+
+        let currentRotation = 0;
+
+        function spinWheel() {
+            if (isSpinning) return;
+            if (!currentUser || currentUser.balance < currentBet) {
+                document.getElementById('game-status-box').innerHTML = `
+                    <span class="text-rose-700 font-bold text-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Solde insuffisant ! Rechargez vos crédits.</span>
+                `;
+                return;
+            }
+
+            currentUser.balance -= currentBet;
+            currentUser.gamesCount += 1;
+            updateUI();
+
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('game-status-box').innerHTML = `
+                <span class="text-terracotta-600 font-bold text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i> La roue tourne... Bonne chance !</span>
+            `;
+
+            const canvas = document.getElementById('wheel-canvas');
+            const extraDegrees = Math.floor(Math.random() * 360) + 1440;
+            currentRotation += extraDegrees;
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                document.getElementById('spin-btn').disabled = false;
+
+                const actualDegree = currentRotation % 360;
+                const segmentDegrees = 360 / wheelSegments.length;
+                const winningIndex = Math.floor((360 - (actualDegree % 360) + 270) % 360 / segmentDegrees);
+                const result = wheelSegments[winningIndex];
+
+                const payout = currentBet * result.multiplier;
+                if (payout > 0) {
+                    currentUser.balance += payout;
+                    document.getElementById('game-status-box').innerHTML = `
+                        <span class="text-emerald-700 font-extrabold text-base">🎉 Bravo ! Vous gagnez ${payout} crédits (${result.label}) !</span>
+                    `;
+                    currentUser.history.unshift({
+                        type: 'Gain Roue',
+                        details: `Résultat: ${result.label}`,
+                        amount: '+' + payout + ' crédits',
+                        date: new Date().toLocaleTimeString()
+                    });
+
+                    if (result.multiplier >= 2 && typeof confetti === 'function') {
+                        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                    }
+                } else {
+                    document.getElementById('game-status-box').innerHTML = `
+                        <span class="text-rose-700 font-bold text-sm">Pas de chance ! Vous avez perdu ${currentBet} crédits.</span>
+                    `;
+                    currentUser.history.unshift({
+                        type: 'Perte Roue',
+                        details: `Mise perdue`,
+                        amount: '-' + currentBet + ' crédits',
+                        date: new Date().toLocaleTimeString()
+                    });
+                }
+
+                saveUserData();
+                updateUI();
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

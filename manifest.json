@@ -1,0 +1,25 @@
+{
+  "name": "Mon Application Micropaiement & Jeux",
+  "short_name": "MicroGames",
+  "description": "Plateforme de mini-jeux avec intégration de micropaiement et authentification WhatsApp.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3EFEA",
+  "theme_color": "#D49B39",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
